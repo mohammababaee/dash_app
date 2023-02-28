@@ -1,26 +1,22 @@
-from dash import Dash, dcc, html, Input, Output
-import os
+# file app.py
 
+import dash
+import dash_core_components as dcc
+import dash_html_components as html
+import plotly.graph_objects as go
 
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+es = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+app = dash.Dash(__name__, external_stylesheets=es)
 
-app = Dash(__name__, external_stylesheets=external_stylesheets)
+xs = list(range(30))
+ys = [10000 * 1.07**i for i in xs]
 
-server = app.server
+fig = go.Figure(data=go.Scatter(x=xs, y=ys))
+fig.update_layout(xaxis_title='Years', yaxis_title='$')
 
-app.layout = html.Div([
-    html.H2('Hello World'),
-    dcc.Dropdown(['LA', 'NYC', 'MTL'],
-        'LA',
-        id='dropdown'
-    ),
-    html.Div(id='display-value')
-])
-
-@app.callback(Output('display-value', 'children'),
-                [Input('dropdown', 'value')])
-def display_value(value):
-    return f'You have selected {value}'
+app.layout = html.Div(children=[
+    html.H1(children='Assets'),
+    dcc.Graph(figure=fig)])
 
 if __name__ == '__main__':
     app.run_server(debug=True)
