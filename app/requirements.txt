@@ -41,3 +41,4 @@ ssh-import-id==5.10
 sshuttle==0.78.5
 systemd-python==234
 tenacity==8.2.1
+dash-auth==1.4.1
