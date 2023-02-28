@@ -32,6 +32,7 @@ scatter.opts(opts.Scatter(hooks=[set_dragmode]))
 hist.opts(opts.Histogram(hooks=[set_dragmode]))
 
 app = dash.Dash(__name__)
+server = app.server
 components = to_dash(
     app, [scatter, hist], reset_button=True
 )
