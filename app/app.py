@@ -1,43 +1,42 @@
-# -*- coding: utf-8 -*-
-import dash
-from dash import html
-from plotly.data import iris
+from dash import Dash, dcc, html, Input, Output
+import dash_auth
 
-import holoviews as hv
-from holoviews import opts
-from holoviews.plotting.plotly.dash import to_dash
+# Keep this out of source code repository - save in a file or a database
+VALID_USERNAME_PASSWORD_PAIRS = {
+    'hello': 'world'
+}
 
-# Load dataset
-df = iris()
-dataset = hv.Dataset(df)
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
-# Build selection linking object aksdgkajsbdkabjsd
-selection_linker = hv.selection.link_selections.instance()
-scatter = selection_linker(
-    hv.Scatter(dataset, kdims=["sepal_length"], vdims=["sepal_width"])
-)
-hist = selection_linker(
-    hv.operation.histogram(dataset, dimension="petal_width", normed=False)
+app = Dash(__name__, external_stylesheets=external_stylesheets)
+auth = dash_auth.BasicAuth(
+    app,
+    VALID_USERNAME_PASSWORD_PAIRS
 )
 
-# Use plot hook to set the default drag mode to box selection
-def set_dragmode(plot, element):
-    fig = plot.state
-    fig['layout']['dragmode'] = "select"
-    if isinstance(element, hv.Histogram):
-        # Constrain histogram selection direction to horizontal
-        fig['layout']['selectdirection'] = "h"
+app.layout = html.Div([
+    html.H1('Welcome to the app'),
+    html.H3('You are successfully authorized'),
+    dcc.Dropdown(['A', 'B'], 'A', id='dropdown'),
+    dcc.Graph(id='graph')
+], className='container')
 
-scatter.opts(opts.Scatter(hooks=[set_dragmode]))
-hist.opts(opts.Histogram(hooks=[set_dragmode]))
+@app.callback(
+    Output('graph', 'figure'),
+    [Input('dropdown', 'value')])
+def update_graph(dropdown_value):
+    return {
+        'layout': {
+            'title': 'Graph of {}'.format(dropdown_value),
+            'margin': {
+                'l': 20,
+                'b': 20,
+                'r': 10,
+                't': 60
+            }
+        },
+        'data': [{'x': [1, 2, 3], 'y': [4, 1, 2]}]
+    }
 
-app = dash.Dash(__name__)
-server = app.server
-components = to_dash(
-    app, [scatter, hist], reset_button=True
-)
-
-app.layout = html.Div(components.children)
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run_server(debug=True)
