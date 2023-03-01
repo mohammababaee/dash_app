@@ -1,42 +1,29 @@
-from dash import Dash, dcc, html, Input, Output
+import dash
+import dash_html_components as html
 import dash_auth
 
-# Keep this out of source code repository - save in a file or a database
+# Define a list of valid username-password pairs
 VALID_USERNAME_PASSWORD_PAIRS = {
-    'hello': 'world'
+    'user1': 'password1',
+    'user2': 'password2'
 }
 
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+# Create a Dash app instance
+app = dash.Dash(__name__)
 
-app = Dash(__name__, external_stylesheets=external_stylesheets)
+# Create a server object for the app
+server = app.server
+
+# Define the app's layout
+app.layout = html.Div([
+    html.H1('Hello, World!'),
+])
+
+# Authenticate users using the BasicAuth object
 auth = dash_auth.BasicAuth(
     app,
     VALID_USERNAME_PASSWORD_PAIRS
 )
-
-app.layout = html.Div([
-    html.H1('Welcome to the app'),
-    html.H3('You are successfully authorized'),
-    dcc.Dropdown(['A', 'B'], 'A', id='dropdown'),
-    dcc.Graph(id='graph')
-], className='container')
-
-@app.callback(
-    Output('graph', 'figure'),
-    [Input('dropdown', 'value')])
-def update_graph(dropdown_value):
-    return {
-        'layout': {
-            'title': 'Graph of {}'.format(dropdown_value),
-            'margin': {
-                'l': 20,
-                'b': 20,
-                'r': 10,
-                't': 60
-            }
-        },
-        'data': [{'x': [1, 2, 3], 'y': [4, 1, 2]}]
-    }
 
 if __name__ == '__main__':
     app.run_server(debug=True)
